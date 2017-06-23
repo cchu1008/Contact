@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">TheApp</string>
+    <string name="app_greeting">Please select your eyeball needs</string>
+    <string name="app_contacts_page">Welcome to the contacts page!</string>
+    <string name="app_appointments_page">Welcome to the appointments page!</string>
+
+    <string name="app_contacts_button">I Just Got\nNew Contacts</string>
+    <string name="app_appointments_button">I Just Made\nAn Appointment</string>
+    <string name="app_home_button">I Just Want to\nGo Home</string>
+</resources>
