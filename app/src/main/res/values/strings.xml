@@ -7,4 +7,6 @@
     <string name="app_contacts_button">I Just Got\nNew Contacts</string>
     <string name="app_appointments_button">I Just Made\nAn Appointment</string>
     <string name="app_home_button">I Just Want to\nGo Home</string>
+
+    <string name="app_set_date_toast">Your date has been saved</string>
 </resources>
