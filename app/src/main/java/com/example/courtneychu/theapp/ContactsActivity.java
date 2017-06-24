@@ -7,7 +7,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -54,11 +53,11 @@ public class ContactsActivity extends AppCompatActivity {
             }
         });
 
-        Button twoMonthsButton = (Button) findViewById(R.id.two_months_button);
-        twoMonthsButton.setOnClickListener(new View.OnClickListener() {
+        Button oneMonthButton = (Button) findViewById(R.id.one_month_button);
+        oneMonthButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToTwoMonths();
+                goToOneMonth();
             }
         });
 
@@ -102,7 +101,7 @@ public class ContactsActivity extends AppCompatActivity {
         toast.show();
     }
 
-    private void goToTwoMonths(){
+    private void goToOneMonth(){
         Context context = getApplicationContext();
         CharSequence text = "Two-month contact lens registered";
         int duration = Toast.LENGTH_SHORT;
