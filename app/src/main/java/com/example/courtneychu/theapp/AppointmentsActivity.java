@@ -18,7 +18,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class AppointmentsActivity extends AppCompatActivity {
-    SetDate fromDate;
+    private SetDate fromDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
