@@ -25,6 +25,16 @@ public class SetDate implements View.OnFocusChangeListener, DatePickerDialog.OnD
         myCalendar = Calendar.getInstance();
     }
 
+    public SetDate(int year, int monthOfYear, int dayOfMonth){
+        this.myCalendar.set(Calendar.YEAR, year);
+        myCalendar.set(Calendar.MONTH, monthOfYear);
+        myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+    }
+
+    public SetDate(Calendar newCalendar){
+        this.myCalendar = newCalendar;
+    }
+
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth){
         String myFormat = "MM/dd/yyyy";
@@ -42,6 +52,10 @@ public class SetDate implements View.OnFocusChangeListener, DatePickerDialog.OnD
         if(hasFocus){
             new DatePickerDialog(this.ctx, this, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
         }
+    }
+
+    public Calendar getDate(){
+        return this.myCalendar;
     }
 
     @Override

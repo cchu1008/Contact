@@ -10,15 +10,21 @@ import android.widget.EditText;
 import android.content.Intent;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+
 public class ContactsActivity extends AppCompatActivity {
     private SetDate fromDate;
+    private EditText enterDate;
+
+    private ArrayList<Calendar> expirationDates = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
-        EditText enterDate = (EditText) findViewById(R.id.startDateContacts);
+        enterDate = (EditText) findViewById(R.id.startDateContacts);
         fromDate = new SetDate(enterDate, this);
 
         Button homeButton = (Button) findViewById(R.id.home_button);
@@ -41,7 +47,7 @@ public class ContactsActivity extends AppCompatActivity {
         oneWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToOneWeek();
+                goToOneWeek(enterDate, fromDate);
             }
         });
 
@@ -49,7 +55,7 @@ public class ContactsActivity extends AppCompatActivity {
         twoWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToTwoWeek();
+                goToTwoWeek(enterDate, fromDate);
             }
         });
 
@@ -57,7 +63,7 @@ public class ContactsActivity extends AppCompatActivity {
         oneMonthButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToOneMonth();
+                goToOneMonth(enterDate, fromDate);
             }
         });
 
@@ -65,7 +71,7 @@ public class ContactsActivity extends AppCompatActivity {
         threeMonthsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToThreeMonths();
+                goToThreeMonths(enterDate, fromDate);
             }
         });
 
@@ -81,43 +87,145 @@ public class ContactsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void goToOneWeek(){
+    private void goToOneWeek(EditText enterDate, SetDate fromDate){
+        Calendar nextDate = getNewDate(0, 0, 7);
+
+        SetDate finalDate = new SetDate(nextDate);
+        String dateToString = finalDate.toString();
+
         Context context = getApplicationContext();
-        CharSequence text = "One-week contact lens registered";
+        CharSequence text = "One-week contact lens registered\n" + dateToString;
         int duration = Toast.LENGTH_SHORT;
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
+
+        expirationDates.add(nextDate);
     }
 
-    private void goToTwoWeek(){
+    private void goToTwoWeek(EditText enterDate, SetDate fromDate){
+        Calendar nextDate = getNewDate(0, 0, 14);
+
+        SetDate finalDate = new SetDate(nextDate);
+        String dateToString = finalDate.toString();
+
         Context context = getApplicationContext();
-        CharSequence text = "Two-week contact lens registered";
+        CharSequence text = "Two-week contact lens registered\n" + dateToString;
         int duration = Toast.LENGTH_SHORT;
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
+
+        expirationDates.add(nextDate);
     }
 
-    private void goToOneMonth(){
+    private void goToOneMonth(EditText enterDate, SetDate fromDate){
+        Calendar nextDate = getNewDate(0, 1, 0);
+
+        SetDate finalDate = new SetDate(nextDate);
+        String dateToString = finalDate.toString();
+
         Context context = getApplicationContext();
-        CharSequence text = "Two-month contact lens registered";
+        CharSequence text = "One-month contact lens registered\n" + dateToString;
         int duration = Toast.LENGTH_SHORT;
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
+
+        expirationDates.add(nextDate);
     }
 
-    private void goToThreeMonths(){
+    private void goToThreeMonths(EditText enterDate, SetDate fromDate){
+        Calendar nextDate = getNewDate(0, 3, 0);
+
+        SetDate finalDate = new SetDate(nextDate);
+        String dateToString = finalDate.toString();
+
         Context context = getApplicationContext();
-        CharSequence text = "Three-month contact lens registered";
+        CharSequence text = "Three-month contact lens registered\n" + dateToString;
         int duration = Toast.LENGTH_SHORT;
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
+
+        expirationDates.add(nextDate);
+    }
+
+    private Calendar getNewDate(int year, int month, int day){
+        Calendar finDate = Calendar.getInstance();
+        int newYear = finDate.get(Calendar.YEAR);
+        int newMonth = finDate.get(Calendar.MONTH);
+        int newDay = finDate.get(Calendar.DAY_OF_MONTH);
+
+        newYear += year;
+
+        if(month != 0){
+            if(newMonth + month >= 12){
+                newYear += (newMonth + month)/12;
+                newMonth += (newMonth + month)%12;
+            }
+            else{
+                newMonth += month;
+            }
+        }
+
+        if(day != 0){
+            if(newMonth == 1){
+                if(newMonth + day >= 28){
+                    newMonth += ((newDay + day)/28);
+                    newDay += ((newDay + day)%28);
+                }
+                else{
+                    newDay += day;
+                }
+            }
+            else if(newMonth < 7){
+                if(newMonth%2 == 0) {
+                    if (newMonth + day >= 31) {
+                        newMonth += ((newDay + day) / 31);
+                        newDay += ((newDay + day) % 31);
+                    } else {
+                        newDay += day;
+                    }
+                }
+                if(newMonth%2 == 1) {
+                    if (newMonth + day >= 30) {
+                        newMonth += ((newDay + day) / 30);
+                        newDay += ((newDay + day) % 30);
+                    } else {
+                        newDay += day;
+                    }
+                }
+            }
+            else{
+                if(newMonth%2 == 1) {
+                    if (newMonth + day >= 31) {
+                        newMonth += ((newDay + day) / 31);
+                        newDay += ((newDay + day) % 31);
+                    } else {
+                        newDay += day;
+                    }
+                }
+                if(newMonth%2 == 2) {
+                    if (newMonth + day >= 30) {
+                        newMonth += ((newDay + day) / 30);
+                        newDay += ((newDay + day) % 30);
+                    } else {
+                        newDay += day;
+                    }
+                }
+
+            }
+        }
+
+        finDate.set(Calendar.YEAR, newYear);
+        finDate.set(Calendar.MONTH, newMonth);
+        finDate.set(Calendar.DAY_OF_MONTH, newDay);
+
+        return finDate;
     }
 }
