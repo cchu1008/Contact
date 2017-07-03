@@ -1,8 +1,6 @@
 package com.example.courtneychu.theapp;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +15,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 public class ContactsActivity extends AppCompatActivity {
     private SetDate fromDate;
