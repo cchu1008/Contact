@@ -8,6 +8,11 @@ import android.content.Intent;
 
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * @param savedInstanceState: Given parameter
+     *
+     * Creates the links for the Buttons and sets up the reference date.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,11 +36,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Moves to the ContactsActivity page (home page)
+     */
     private void goToContactsActivity(){
         Intent intent = new Intent(this, ContactsActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Moves to the AppointmentsActivity page (home page)
+     */
     private void goToAppointmentsActivity(){
         Intent intent = new Intent(this, AppointmentsActivity.class);
         startActivity(intent);

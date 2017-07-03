@@ -18,6 +18,10 @@ public class SetDate implements View.OnFocusChangeListener, DatePickerDialog.OnD
     private Calendar myCalendar;
     private Context ctx;
 
+    /**
+     * @param editText : Text form for the date
+     * @param ctx : Context
+     */
     public SetDate(EditText editText, Context ctx) {
         this.editText = editText;
         this.editText.setOnFocusChangeListener(this);
@@ -25,16 +29,32 @@ public class SetDate implements View.OnFocusChangeListener, DatePickerDialog.OnD
         myCalendar = Calendar.getInstance();
     }
 
+    /**
+     * @param year : Year to be set
+     * @param monthOfYear : Month to be set
+     * @param dayOfMonth : Day of month to be set
+     */
     public SetDate(int year, int monthOfYear, int dayOfMonth){
         this.myCalendar.set(Calendar.YEAR, year);
         myCalendar.set(Calendar.MONTH, monthOfYear);
         myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
     }
 
+    /**
+     * @param newCalendar : Calendar w/ date to be set
+     */
     public SetDate(Calendar newCalendar){
         this.myCalendar = newCalendar;
     }
 
+    /**
+     * @param view : Given DatePicker
+     * @param year : Year to be set from the DatePicker
+     * @param monthOfYear : Month to be set from the DatePicker
+     * @param dayOfMonth : Day of month to be set from the DatePicker
+     *
+     * Brings up calendar to pick the date.
+     */
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth){
         String myFormat = "MM/dd/yyyy";
@@ -47,6 +67,10 @@ public class SetDate implements View.OnFocusChangeListener, DatePickerDialog.OnD
         editText.setText(sdformat.format(myCalendar.getTime()));
     }
 
+    /**
+     * @param v : Given view
+     * @param hasFocus : Boolean value of whether the calendar is visible
+     */
     @Override
     public void onFocusChange(View v, boolean hasFocus){
         if(hasFocus){
@@ -54,15 +78,25 @@ public class SetDate implements View.OnFocusChangeListener, DatePickerDialog.OnD
         }
     }
 
-    public Calendar getDate(){
+    /**
+     * @return Calendar : This date (Calendar)
+     */
+    public Calendar getCalendar(){
         return this.myCalendar;
     }
 
+    /**
+     * @return String : String version of the date
+     */
     @Override
     public String toString(){
         return getMonth(myCalendar.get(Calendar.MONTH)) + " " + myCalendar.get(Calendar.DAY_OF_MONTH) + ", " + myCalendar.get(Calendar.YEAR);
     }
 
+    /**
+     * @param month : Given month
+     * @return String : String representation of the month
+     */
     private String getMonth(int month){
         switch(month){
             case 0:

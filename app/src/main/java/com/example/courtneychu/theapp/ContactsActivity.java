@@ -1,7 +1,6 @@
 package com.example.courtneychu.theapp;
 
 import android.content.Context;
-import android.os.Build;
 import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,9 +17,13 @@ import java.util.List;
 
 public class ContactsActivity extends AppCompatActivity {
     private SetDate fromDate;
-
     private ArrayList<Calendar> expirationDates = new ArrayList<>();
 
+    /**
+     * @param savedInstanceState: Given parameter
+     *
+     * Creates the links for the Buttons and sets up the reference date.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +52,7 @@ public class ContactsActivity extends AppCompatActivity {
         oneWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToOneWeek(fromDate.getDate());
+                goToOneWeek(fromDate.getCalendar());
             }
         });
 
@@ -57,7 +60,7 @@ public class ContactsActivity extends AppCompatActivity {
         twoWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToTwoWeek(fromDate.getDate());
+                goToTwoWeek(fromDate.getCalendar());
             }
         });
 
@@ -65,7 +68,7 @@ public class ContactsActivity extends AppCompatActivity {
         oneMonthButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToOneMonth(fromDate.getDate());
+                goToOneMonth(fromDate.getCalendar());
             }
         });
 
@@ -73,22 +76,33 @@ public class ContactsActivity extends AppCompatActivity {
         threeMonthsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToThreeMonths(fromDate.getDate());
+                goToThreeMonths(fromDate.getCalendar());
             }
         });
 
     }
 
+    /**
+     * Moves to the MainActivity page (home page)
+     */
     private void goToMainActivity(){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Moves to the AppointmentActivity page
+     */
     private void goToAppointmentsActivity(){
         Intent intent = new Intent(this, AppointmentsActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * @param fromDate: Start date
+     *
+     * Adds date one week from fromDate to the expirationDates list. Also deploys a toast stating this.
+     */
     private void goToOneWeek(Calendar fromDate){
         Calendar nextDate = getNewDate(fromDate, 0, 0, 7);
 
@@ -106,6 +120,11 @@ public class ContactsActivity extends AppCompatActivity {
         addAndSort(expirationDates, nextDate);
     }
 
+    /**
+     * @param fromDate: Start date
+     *
+     * Adds date two weeks from fromDate to the expirationDates list. Also deploys a toast stating this.
+     */
     private void goToTwoWeek(Calendar fromDate){
         Calendar nextDate = getNewDate(fromDate, 0, 0, 14);
 
@@ -123,6 +142,11 @@ public class ContactsActivity extends AppCompatActivity {
         addAndSort(expirationDates, nextDate);
     }
 
+    /**
+     * @param fromDate: Start date
+     *
+     * Adds date one month from fromDate to the expirationDates list. Also deploys a toast stating this.
+     */
     private void goToOneMonth(Calendar fromDate){
         Calendar nextDate = getNewDate(fromDate, 0, 1, 0);
 
@@ -140,6 +164,11 @@ public class ContactsActivity extends AppCompatActivity {
         addAndSort(expirationDates, nextDate);
     }
 
+    /**
+     * @param fromDate: Start date
+     *
+     * Adds date three months from fromDate to the expirationDates list. Also deploys a toast stating this.
+     */
     private void goToThreeMonths(Calendar fromDate){
         Calendar nextDate = getNewDate(fromDate, 0, 3, 0);
 
@@ -157,6 +186,13 @@ public class ContactsActivity extends AppCompatActivity {
         addAndSort(expirationDates, nextDate);
     }
 
+    /**
+     *
+     * @param expirationDates : List of contact expiration dates (List<Calendar>)
+     * @param nextDate : The date to be added to the list expirationDates (Calendar)
+     *
+     * Adds nextDate to expirationDates in order. Also brings up Google Calendars to add the event.
+     */
     private void addAndSort(List<Calendar> expirationDates, Calendar nextDate){
         for(int i = 0; i < expirationDates.size(); i++){
             Calendar currentDate = expirationDates.get(i);
@@ -181,33 +217,27 @@ public class ContactsActivity extends AppCompatActivity {
         }
 
         //.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true) is the code for setting an all-day event
-
-        if (Build.VERSION.SDK_INT >= 14) {
-            Intent intent = new Intent(Intent.ACTION_INSERT)
-                    .setData(CalendarContract.Events.CONTENT_URI)
-                    .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, nextDate.getTimeInMillis())
-                    .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, nextDate.getTimeInMillis() + 60*60*1000)
-                    .putExtra(CalendarContract.Events.TITLE, "Contacts Alert")
-                    .putExtra(CalendarContract.Events.DESCRIPTION, "Contacts have expired!")
-                    .putExtra(CalendarContract.Reminders.EVENT_ID, nextDate.getTimeInMillis())
-                    .putExtra(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT)
-                    .putExtra(CalendarContract.Reminders.MINUTES, 10)
-                    .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_TENTATIVE);
-            startActivity(intent);
-        }
-
-        else {
-            Intent intent = new Intent(Intent.ACTION_EDIT);
-            intent.setType("vnd.android.cursor.item/event");
-            intent.putExtra("beginTime", nextDate.getTimeInMillis());
-            intent.putExtra("allDay", true);
-            intent.putExtra("rrule", "FREQ=YEARLY");
-            intent.putExtra("endTime", nextDate.getTimeInMillis()+60*60*1000);
-            intent.putExtra("title", "Contacts Alert");
-            startActivity(intent);
-        }
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, nextDate.getTimeInMillis())
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, nextDate.getTimeInMillis() + 60*60*1000)
+                .putExtra(CalendarContract.Events.TITLE, "Contacts Alert")
+                .putExtra(CalendarContract.Events.DESCRIPTION, "Contacts have expired!")
+                .putExtra(CalendarContract.Reminders.EVENT_ID, nextDate.getTimeInMillis())
+                .putExtra(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT)
+                .putExtra(CalendarContract.Reminders.MINUTES, 10)
+                .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_TENTATIVE);
+        startActivity(intent);
     }
 
+    /**
+     *
+     * @param fromDate : Start date (Calendar)
+     * @param year : The years from the start date
+     * @param month : The months from the start date
+     * @param day : The days from the start date
+     * @return Calendar: The date from the start day given the delay.
+     */
     private Calendar getNewDate(Calendar fromDate, int year, int month, int day){
         Calendar finDate = Calendar.getInstance();
         finDate.set(Calendar.YEAR, fromDate.get(Calendar.YEAR));
