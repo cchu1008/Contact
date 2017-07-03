@@ -1,6 +1,10 @@
 package com.example.courtneychu.theapp;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -12,10 +16,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
 
 public class ContactsActivity extends AppCompatActivity {
     private SetDate fromDate;
-    private EditText enterDate;
 
     private ArrayList<Calendar> expirationDates = new ArrayList<>();
 
@@ -24,7 +29,7 @@ public class ContactsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
-        enterDate = (EditText) findViewById(R.id.startDateContacts);
+        EditText enterDate = (EditText) findViewById(R.id.startDateContacts);
         fromDate = new SetDate(enterDate, this);
 
         Button homeButton = (Button) findViewById(R.id.home_button);
@@ -47,7 +52,7 @@ public class ContactsActivity extends AppCompatActivity {
         oneWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToOneWeek(enterDate, fromDate);
+                goToOneWeek(fromDate.getDate());
             }
         });
 
@@ -55,7 +60,7 @@ public class ContactsActivity extends AppCompatActivity {
         twoWeekButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToTwoWeek(enterDate, fromDate);
+                goToTwoWeek(fromDate.getDate());
             }
         });
 
@@ -63,7 +68,7 @@ public class ContactsActivity extends AppCompatActivity {
         oneMonthButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToOneMonth(enterDate, fromDate);
+                goToOneMonth(fromDate.getDate());
             }
         });
 
@@ -71,7 +76,7 @@ public class ContactsActivity extends AppCompatActivity {
         threeMonthsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                goToThreeMonths(enterDate, fromDate);
+                goToThreeMonths(fromDate.getDate());
             }
         });
 
@@ -87,8 +92,8 @@ public class ContactsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void goToOneWeek(EditText enterDate, SetDate fromDate){
-        Calendar nextDate = getNewDate(0, 0, 7);
+    private void goToOneWeek(Calendar fromDate){
+        Calendar nextDate = getNewDate(fromDate, 0, 0, 7);
 
         SetDate finalDate = new SetDate(nextDate);
         String dateToString = finalDate.toString();
@@ -101,11 +106,11 @@ public class ContactsActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
 
-        expirationDates.add(nextDate);
+        addAndSort(expirationDates, nextDate);
     }
 
-    private void goToTwoWeek(EditText enterDate, SetDate fromDate){
-        Calendar nextDate = getNewDate(0, 0, 14);
+    private void goToTwoWeek(Calendar fromDate){
+        Calendar nextDate = getNewDate(fromDate, 0, 0, 14);
 
         SetDate finalDate = new SetDate(nextDate);
         String dateToString = finalDate.toString();
@@ -118,11 +123,11 @@ public class ContactsActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
 
-        expirationDates.add(nextDate);
+        addAndSort(expirationDates, nextDate);
     }
 
-    private void goToOneMonth(EditText enterDate, SetDate fromDate){
-        Calendar nextDate = getNewDate(0, 1, 0);
+    private void goToOneMonth(Calendar fromDate){
+        Calendar nextDate = getNewDate(fromDate, 0, 1, 0);
 
         SetDate finalDate = new SetDate(nextDate);
         String dateToString = finalDate.toString();
@@ -135,11 +140,11 @@ public class ContactsActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
 
-        expirationDates.add(nextDate);
+        addAndSort(expirationDates, nextDate);
     }
 
-    private void goToThreeMonths(EditText enterDate, SetDate fromDate){
-        Calendar nextDate = getNewDate(0, 3, 0);
+    private void goToThreeMonths(Calendar fromDate){
+        Calendar nextDate = getNewDate(fromDate, 0, 3, 0);
 
         SetDate finalDate = new SetDate(nextDate);
         String dateToString = finalDate.toString();
@@ -152,21 +157,73 @@ public class ContactsActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
 
-        expirationDates.add(nextDate);
+        addAndSort(expirationDates, nextDate);
     }
 
-    private Calendar getNewDate(int year, int month, int day){
+    private void addAndSort(List<Calendar> expirationDates, Calendar nextDate){
+        for(int i = 0; i < expirationDates.size(); i++){
+            Calendar currentDate = expirationDates.get(i);
+
+            if(currentDate == null){
+                expirationDates.add(i, nextDate);
+            }
+
+            else if(currentDate.get(Calendar.YEAR) == nextDate.get(Calendar.YEAR)){
+                if(currentDate.get(Calendar.MONTH) == nextDate.get(Calendar.MONTH)){
+                    if(currentDate.get(Calendar.DAY_OF_MONTH) >= nextDate.get(Calendar.DAY_OF_MONTH)){
+                        expirationDates.add(i, nextDate);
+                    }
+                }
+                else if(currentDate.get(Calendar.MONTH) > nextDate.get(Calendar.MONTH)){
+                    expirationDates.add(i, nextDate);
+                }
+            }
+            else if(currentDate.get(Calendar.YEAR) > nextDate.get(Calendar.YEAR)){
+                expirationDates.add(i, nextDate);
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= 14) {
+            Intent intent = new Intent(Intent.ACTION_INSERT)
+                    .setData(CalendarContract.Events.CONTENT_URI)
+                    .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
+                    .putExtra(CalendarContract.Events.TITLE, "Contacts Alert")
+                    .putExtra(CalendarContract.Events.DESCRIPTION, "Contacts have expired!")
+                    .putExtra(CalendarContract.Reminders.EVENT_ID, nextDate.getTimeInMillis())
+                    .putExtra(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT)
+                    .putExtra(CalendarContract.Reminders.MINUTES, 10)
+                    .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_TENTATIVE);
+            startActivity(intent);
+        }
+
+        else {
+            Intent intent = new Intent(Intent.ACTION_EDIT);
+            intent.setType("vnd.android.cursor.item/event");
+            intent.putExtra("beginTime", nextDate.getTimeInMillis());
+            intent.putExtra("allDay", true);
+            intent.putExtra("rrule", "FREQ=YEARLY");
+            intent.putExtra("endTime", nextDate.getTimeInMillis()+60*60*1000);
+            intent.putExtra("title", "Contacts Alert");
+            startActivity(intent);
+        }
+    }
+
+    private Calendar getNewDate(Calendar fromDate, int year, int month, int day){
         Calendar finDate = Calendar.getInstance();
-        int newYear = finDate.get(Calendar.YEAR);
-        int newMonth = finDate.get(Calendar.MONTH);
-        int newDay = finDate.get(Calendar.DAY_OF_MONTH);
+        finDate.set(Calendar.YEAR, fromDate.get(Calendar.YEAR));
+        finDate.set(Calendar.MONTH, fromDate.get(Calendar.MONTH));
+        finDate.set(Calendar.DAY_OF_MONTH, fromDate.get(Calendar.DAY_OF_MONTH));
+
+        int newYear = fromDate.get(Calendar.YEAR);
+        int newMonth = fromDate.get(Calendar.MONTH);
+        int newDay = fromDate.get(Calendar.DAY_OF_MONTH);
 
         newYear += year;
 
         if(month != 0){
-            if(newMonth + month >= 12){
-                newYear += (newMonth + month)/12;
-                newMonth += (newMonth + month)%12;
+            if(fromDate.get(Calendar.MONTH) + month >= 12){
+                newYear += (fromDate.get(Calendar.MONTH) + month)/12;
+                newMonth += (fromDate.get(Calendar.MONTH) + month)%12;
             }
             else{
                 newMonth += month;
@@ -174,46 +231,46 @@ public class ContactsActivity extends AppCompatActivity {
         }
 
         if(day != 0){
-            if(newMonth == 1){
-                if(newMonth + day >= 28){
-                    newMonth += ((newDay + day)/28);
-                    newDay += ((newDay + day)%28);
+            if((fromDate.get(Calendar.MONTH)) == Calendar.FEBRUARY){
+                if(fromDate.get(Calendar.MONTH) + day >= 28){
+                    newMonth += ((fromDate.get(Calendar.DAY_OF_MONTH) + day)/28);
+                    newDay += ((fromDate.get(Calendar.DAY_OF_MONTH) + day)%28);
                 }
                 else{
                     newDay += day;
                 }
             }
-            else if(newMonth < 7){
-                if(newMonth%2 == 0) {
-                    if (newMonth + day >= 31) {
-                        newMonth += ((newDay + day) / 31);
-                        newDay += ((newDay + day) % 31);
+            else if(fromDate.get(Calendar.MONTH) < Calendar.AUGUST){
+                if(fromDate.get(Calendar.MONTH)%2 == 0) {
+                    if (fromDate.get(Calendar.MONTH) + day >= 31) {
+                        newMonth += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) / 31);
+                        newDay += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) % 31);
                     } else {
                         newDay += day;
                     }
                 }
-                if(newMonth%2 == 1) {
-                    if (newMonth + day >= 30) {
-                        newMonth += ((newDay + day) / 30);
-                        newDay += ((newDay + day) % 30);
+                if(fromDate.get(Calendar.MONTH)%2 == 1) {
+                    if (fromDate.get(Calendar.MONTH) + day >= 30) {
+                        newMonth += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) / 30);
+                        newDay += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) % 30);
                     } else {
                         newDay += day;
                     }
                 }
             }
             else{
-                if(newMonth%2 == 1) {
-                    if (newMonth + day >= 31) {
-                        newMonth += ((newDay + day) / 31);
-                        newDay += ((newDay + day) % 31);
+                if(fromDate.get(Calendar.MONTH)%2 == 1) {
+                    if (fromDate.get(Calendar.MONTH) + day >= 31) {
+                        newMonth += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) / 31);
+                        newDay += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) % 31);
                     } else {
                         newDay += day;
                     }
                 }
-                if(newMonth%2 == 2) {
-                    if (newMonth + day >= 30) {
-                        newMonth += ((newDay + day) / 30);
-                        newDay += ((newDay + day) % 30);
+                if(fromDate.get(Calendar.MONTH)%2 == 2) {
+                    if (fromDate.get(Calendar.MONTH) + day >= 30) {
+                        newMonth += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) / 30);
+                        newDay += ((fromDate.get(Calendar.DAY_OF_MONTH) + day) % 30);
                     } else {
                         newDay += day;
                     }
