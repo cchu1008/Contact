@@ -180,10 +180,13 @@ public class ContactsActivity extends AppCompatActivity {
             }
         }
 
+        //.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true) is the code for setting an all-day event
+
         if (Build.VERSION.SDK_INT >= 14) {
             Intent intent = new Intent(Intent.ACTION_INSERT)
                     .setData(CalendarContract.Events.CONTENT_URI)
-                    .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
+                    .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, nextDate.getTimeInMillis())
+                    .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, nextDate.getTimeInMillis() + 60*60*1000)
                     .putExtra(CalendarContract.Events.TITLE, "Contacts Alert")
                     .putExtra(CalendarContract.Events.DESCRIPTION, "Contacts have expired!")
                     .putExtra(CalendarContract.Reminders.EVENT_ID, nextDate.getTimeInMillis())
