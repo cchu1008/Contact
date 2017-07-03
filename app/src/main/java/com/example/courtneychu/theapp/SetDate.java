@@ -9,9 +9,6 @@ import android.widget.EditText;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-/**
- * Created by Courtney Chu on 6/23/2017.
- */
 
 public class SetDate implements View.OnFocusChangeListener, DatePickerDialog.OnDateSetListener {
     private EditText editText;
